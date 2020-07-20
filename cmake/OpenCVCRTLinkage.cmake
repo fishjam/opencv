@@ -43,7 +43,7 @@ endif()
 # Ignore warning: This object file does not define any previously undefined public symbols, ...
 set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /IGNORE:4221")
 
-if(NOT BUILD_SHARED_LIBS AND BUILD_WITH_STATIC_CRT)
+if(BUILD_WITH_STATIC_CRT)
   foreach(flag_var
           CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
           CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
@@ -56,10 +56,6 @@ if(NOT BUILD_SHARED_LIBS AND BUILD_WITH_STATIC_CRT)
       string(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
     endif()
   endforeach(flag_var)
-
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:atlthunk.lib")
-  set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcpmt.lib /NODEFAULTLIB:msvcrt.lib")
-  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:libcpmtd.lib /NODEFAULTLIB:msvcrtd.lib")
 else()
   foreach(flag_var
           CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
@@ -73,6 +69,12 @@ else()
       string(REGEX REPLACE "/MTd" "/MDd" ${flag_var} "${${flag_var}}")
     endif()
   endforeach(flag_var)
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:atlthunk.lib")
+  set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcpmt.lib /NODEFAULTLIB:msvcrt.lib")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:libcpmtd.lib /NODEFAULTLIB:msvcrtd.lib")
 endif()
 
 if(CMAKE_VERSION VERSION_GREATER "2.8.6")
